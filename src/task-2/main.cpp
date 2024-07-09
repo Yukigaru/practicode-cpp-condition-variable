@@ -99,3 +99,6 @@ int main() {
 
     return 0;
 }
+/* Доп. задачи:
+ * - попробовать использовать std::condition_variable_any и другой вид lock'а
+ * */
