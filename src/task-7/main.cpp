@@ -7,6 +7,9 @@
 
 using namespace std::chrono_literals;
 
+// RWLock - reader/write lock или shared mutex, примитив синхронизации, в отличие от обычного мьютекса
+// позволяющий нескольким читателям (read-only) входить в критическую секцию одновременно.
+// Появившийся писатель должен подождать, пока читатели выйдут из критической секции.
 class RWLock {
 public:
     void lock_shared() {
