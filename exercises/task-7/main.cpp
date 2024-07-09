@@ -47,7 +47,6 @@ void test_simple() {
     l.unlock();
     l.lock_shared();
     l.unlock_shared();
-    PASS();
 }
 
 void test_readers_dont_block() {
@@ -61,7 +60,6 @@ void test_readers_dont_block() {
     t.join();
     l.unlock_shared();
     // Если дошли, значит читатели не блокируют друг друга
-    PASS();
 }
 
 void test_writer_blocks_reader() {
@@ -73,14 +71,13 @@ void test_writer_blocks_reader() {
         l.lock_shared();
         l.unlock_shared();
         auto end = std::chrono::steady_clock::now();
-        EXPECT(end - start >= 100ms);
+        EXPECT_GT(end - start, 99ms);
     });
 
     std::this_thread::sleep_for(100ms);
     l.unlock();
 
     reader.join();
-    PASS();
 }
 
 void test_reader_blocks_writer() {
@@ -92,14 +89,13 @@ void test_reader_blocks_writer() {
         l.lock();
         l.unlock();
         auto end = std::chrono::steady_clock::now();
-        EXPECT(end - start >= 100ms);
+        EXPECT_GT(end - start, 99ms);
     });
 
     std::this_thread::sleep_for(100ms);
     l.unlock_shared();
 
     reader.join();
-    PASS();
 }
 
 void test_two_writers_block_each_other() {
@@ -111,14 +107,13 @@ void test_two_writers_block_each_other() {
         l.lock();
         l.unlock();
         auto end = std::chrono::steady_clock::now();
-        EXPECT(end - start >= 100ms);
+        EXPECT_GT(end - start, 99ms);
     });
 
     std::this_thread::sleep_for(100ms);
     l.unlock();
 
     writer2.join();
-    PASS();
 }
 
 void test_many_threads() {
@@ -150,7 +145,6 @@ void test_many_threads() {
     for (auto& t : threads) {
         t.join();
     }
-    PASS();
 }
 
 int main() {

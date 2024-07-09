@@ -41,11 +41,9 @@ void test_multiple_push_pop() {
     queue.push(1);
     queue.push(2);
     queue.push(3);
-    EXPECT(queue.pop() == 1);
-    EXPECT(queue.pop() == 2);
-    EXPECT(queue.pop() == 3);
-
-    PASS();
+    EXPECT_EQ(queue.pop(), 1);
+    EXPECT_EQ(queue.pop(), 2);
+    EXPECT_EQ(queue.pop(), 3);
 }
 
 void test_pop_wait() {
@@ -59,16 +57,14 @@ void test_pop_wait() {
 
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
     // Подождали, проверяем, что pop все еще заблокирован
-    EXPECT(item_popped.load() == false);
+    EXPECT_FALSE(item_popped.load());
 
     // Разблокируем поток, ожидающий в pop
     queue.push(1);
 
     consumer.join();
 
-    EXPECT(item_popped.load() == true);
-
-    PASS();
+    EXPECT_TRUE(item_popped.load());
 }
 
 void test_multiple_threads() {
@@ -108,16 +104,14 @@ void test_multiple_threads() {
     }
 
     // Проверяем, что из очереди было получено нужное кол-во объектов
-    EXPECT(consumed.size() == N * NumThreads);
+    EXPECT_EQ(consumed.size(), N * NumThreads);
 
     std::sort(std::begin(consumed), std::end(consumed));
 
     for (int i = 1; i < N; ++i) {
         // Проверяем, что нет дублей и дырок
-        EXPECT(consumed[i] == consumed[i - 1] + 1);
+        EXPECT_EQ(consumed[i], consumed[i - 1] + 1);
     }
-
-    PASS();
 }
 
 int main() {

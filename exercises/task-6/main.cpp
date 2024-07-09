@@ -51,18 +51,16 @@ void test_multiple_push_pop() {
     int value;
 
     bool success = queue.pop(value);
-    EXPECT(success);
-    EXPECT(value == 1);
+    EXPECT_TRUE(success);
+    EXPECT_EQ(value, 1);
 
     success = queue.pop(value);
-    EXPECT(success);
-    EXPECT(value == 2);
+    EXPECT_TRUE(success);
+    EXPECT_EQ(value, 2);
 
     success = queue.pop(value);
-    EXPECT(success);
-    EXPECT(value == 3);
-
-    PASS();
+    EXPECT_TRUE(success);
+    EXPECT_EQ(value, 3);
 }
 
 void test_pop_wait() {
@@ -76,15 +74,13 @@ void test_pop_wait() {
     }};
 
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    EXPECT(item_popped.load() == false);
+    EXPECT_FALSE(item_popped.load());
 
     queue.push(1);
 
     consumer.join();
 
-    EXPECT(item_popped.load() == true);
-
-    PASS();
+    EXPECT_TRUE(item_popped.load());
 }
 
 void test_push_wait() {
@@ -101,15 +97,13 @@ void test_push_wait() {
     });
 
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    EXPECT(values_pushed.load() == Limit);
+    EXPECT_EQ(values_pushed.load(), Limit);
 
     int unused;
     queue.pop(unused);
     producer.join();
 
-    EXPECT(values_pushed.load() == Limit + 1);
-
-    PASS();
+    EXPECT_EQ(values_pushed.load(), Limit + 1);
 }
 
 void test_multiple_threads() {
@@ -149,22 +143,20 @@ void test_multiple_threads() {
         t.join();
     }
 
-    EXPECT(consumed.size() == N * NumThreads);
+    EXPECT_EQ(consumed.size(), N * NumThreads);
 
     std::sort(std::begin(consumed), std::end(consumed));
 
     for (int i = 1; i < N; ++i) {
-        EXPECT(consumed[i] == consumed[i - 1] + 1);
+        EXPECT_EQ(consumed[i], consumed[i - 1] + 1);
     }
-
-    PASS();
 }
 
 void test_push_with_timeout() {
     ConcurrentFIFOQueue<int> queue{1};
 
     // завершится без таймаута
-    EXPECT(queue.push(1, std::chrono::seconds(1)));
+    EXPECT_TRUE(queue.push(1, std::chrono::seconds(1)));
 
     std::atomic<bool> timeout_occurred{false};
 
@@ -175,13 +167,11 @@ void test_push_with_timeout() {
         }
     });
 
-    EXPECT(!timeout_occurred.load());
+    EXPECT_FALSE(timeout_occurred.load());
 
     producer.join();
 
-    EXPECT(timeout_occurred.load());
-
-    PASS();
+    EXPECT_TRUE(timeout_occurred.load());
 }
 
 void test_pop_with_timeout() {
@@ -197,13 +187,11 @@ void test_pop_with_timeout() {
         }
     });
 
-    EXPECT(!timeout_occurred.load());
+    EXPECT_FALSE(timeout_occurred.load());
 
     consumer.join();
 
-    EXPECT(timeout_occurred.load());
-
-    PASS();
+    EXPECT_TRUE(timeout_occurred.load());
 }
 
 int main() {

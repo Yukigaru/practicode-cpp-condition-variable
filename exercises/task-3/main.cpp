@@ -45,8 +45,6 @@ void test_latch_synchronizes_threads() {
     for (auto& t : threads) {
         t.join();
     }
-    // Если дошли до PASS, значит все потоки завершились
-    PASS();
 }
 
 void test_latch_awaits() {
@@ -58,7 +56,7 @@ void test_latch_awaits() {
 
         // Проверяем, что потоки были в ожидании не менее 100 ms
         auto end = std::chrono::steady_clock::now();
-        EXPECT(end - start >= 100ms);
+        EXPECT_GT(end - start, 99ms);
     };
 
     std::thread t1{worker};
@@ -70,7 +68,6 @@ void test_latch_awaits() {
 
     t1.join();
     t2.join();
-    PASS();
 }
 
 void test_latch_doesnt_reset() {
@@ -85,7 +82,6 @@ void test_latch_doesnt_reset() {
     // Не должно заблокироваться, т.к. один раз latch уже сработал
     std::thread t3{[&]() { latch.arrive_and_wait(); }};
     t3.join();
-    PASS();
 }
 
 int main() {

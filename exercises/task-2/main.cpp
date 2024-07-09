@@ -37,8 +37,6 @@ void test_set_flag_before_wait() {
     });
 
     test_thread.join();
-
-    PASS();
 }
 
 void test_wait_then_set_flag() {
@@ -58,15 +56,14 @@ void test_wait_then_set_flag() {
     }
 
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    EXPECT(waits_passed == 0);  // Проверка, что потоки были и всё еще в ожидании
+    EXPECT_EQ(waits_passed, 0);  // Проверка, что потоки были и всё еще в ожидании
 
     flag.set_flag();  // Ставим флаг и разблокируем потоки
 
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    EXPECT(waits_passed == NumThreads);  // Проверяем счетчик
+    EXPECT_EQ(waits_passed, NumThreads);  // Проверяем счетчик
 
     // Не завершается этот тест? Используешь ли ты notify_all, вместо notify_one?
-    PASS();
 }
 
 void test_lost_wakeup() {
@@ -83,7 +80,6 @@ void test_lost_wakeup() {
         t1.join();
         t2.join();
     }
-    PASS();
 }
 
 int main() {
