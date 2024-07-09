@@ -20,7 +20,7 @@ set(TARGETS
 foreach(TARGET ${TARGETS})
   add_executable(${TARGET} exercises/${TARGET}/main.cpp)
 
-  target_include_directories(${TARGET} PRIVATE exercises/common)
+  target_include_directories(${TARGET} PRIVATE include/common)
   if(ENABLE_TSAN)
     target_compile_options(${TARGET} PRIVATE -fsanitize=thread)
     target_link_options(${TARGET} PRIVATE -fsanitize=thread)
