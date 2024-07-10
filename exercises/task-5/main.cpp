@@ -146,4 +146,10 @@ int main() {
  *   после чего пытается вставить максимально возможное в данный момент времени количество элементов.
  *
  * - добавь аналогичный метод `size_t pop_bulk(out_iter, max_count)`.
- * */
+ *
+ * - добавь методы
+ *     bool push(const T& val, std::chrono::steady_clock::duration timeout) и
+ *     bool pop(T& out, std::chrono::steady_clock::duration timeout),
+ *   работающие не дольше заданного времени, и возвращающие false в случае таймаута.
+ *
+ */
