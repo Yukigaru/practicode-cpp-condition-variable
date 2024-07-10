@@ -22,12 +22,16 @@ std::string to_string(const std::chrono::duration<Rep, Period>& duration) {
 #define EXPECT_OP(expr, op, expected) \
     if (!((expr) op (expected))) { \
         std::string msg = "`" #expr "` got: " + std::to_string(expr) + ", expected: " + std::to_string(expected) + " at line " + std::to_string(__LINE__); \
+        std::string out_msg = "[FAIL] " + ctx.func_name + ": " + msg + "\n"; \
+        std::cerr << out_msg; \
         throw std::runtime_error(msg); \
     }
 
 #define EXPECT(expr) \
     if (!(expr)) { \
         std::string msg = #expr " at line " + std::to_string(__LINE__); \
+        std::string out_msg = "[FAIL] " + ctx.func_name + ": " + msg + "\n"; \
+        std::cerr << out_msg; \
         throw std::runtime_error(msg); \
     }
 
@@ -46,9 +50,13 @@ std::string to_string(const std::chrono::duration<Rep, Period>& duration) {
 #define EXPECT_FALSE(expr) EXPECT_OP(expr, ==, false)
 
 
+struct TestContext {
+    std::string func_name;
+};
+
 // Макрос запускает тест N раз, а так же вызывает exit, если тест не завершился за 2 секунды
 #define REPEATED_TEST(testFunc, N) \
-    void testFunc(); \
+    void testFunc(const TestContext &); \
     bool testFunc##_wrapper() { \
         bool finish{false}; \
         std::mutex m; \
@@ -67,12 +75,13 @@ std::string to_string(const std::chrono::duration<Rep, Period>& duration) {
         }); \
         bool pass{}; \
         try { \
+            TestContext ctx{ std::string{ #testFunc } }; \
             for (int i = 0; i < N; ++i) { \
-                testFunc(); \
+                testFunc(ctx); \
             } \
             pass = true; \
         } catch (const std::exception& e) { \
-            std::cerr << "[FAIL] " #testFunc ": " << e.what() << std::endl; \
+            \
         } \
         { \
             std::unique_lock l{m}; \
@@ -88,7 +97,7 @@ std::string to_string(const std::chrono::duration<Rep, Period>& duration) {
     struct testFunc##_registrar { \
         testFunc##_registrar() { _all_tests.push_back(testFunc##_wrapper); } \
     } testFunc##_instance; \
-    void testFunc()
+    void testFunc(const TestContext &ctx)
 
 
 #define TEST(testFunc) REPEATED_TEST(testFunc, 10)

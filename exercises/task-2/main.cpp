@@ -28,7 +28,7 @@ private:
 /*
  * Тесты
  */
-void test_set_flag_before_wait() {
+TEST(test_set_flag_before_wait) {
     ThreadFlag flag;
     flag.set_flag();  // Ставим флаг еще до ожидания
 
@@ -39,7 +39,7 @@ void test_set_flag_before_wait() {
     test_thread.join();
 }
 
-void test_wait_then_set_flag() {
+TEST(test_wait_then_set_flag) {
     ThreadFlag flag;
     std::atomic_int waits_passed{0};
 
@@ -66,7 +66,7 @@ void test_wait_then_set_flag() {
     // Не завершается этот тест? Используешь ли ты notify_all, вместо notify_one?
 }
 
-void test_lost_wakeup() {
+TEST(test_lost_wakeup) {
     for (auto i = 0u; i < 5000; i++) {
         ThreadFlag flag;
 
@@ -83,16 +83,7 @@ void test_lost_wakeup() {
 }
 
 int main() {
-    try {
-        test_set_flag_before_wait();
-        test_wait_then_set_flag();
-        test_lost_wakeup();
-
-    } catch (const std::exception& e) {
-        std::cerr << e.what() << std::endl;
-        return 1;
-    }
-
+    RUN_TESTS();
     return 0;
 }
 /* Доп. задачи:
