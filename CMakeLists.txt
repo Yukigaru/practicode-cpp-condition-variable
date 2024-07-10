@@ -15,12 +15,18 @@ set(TARGETS
       task-5
       task-6
       task-7
+      hw_call_once
 )
 
 foreach(TARGET ${TARGETS})
-  add_executable(${TARGET} exercises/${TARGET}/main.cpp)
+  if(${TARGET} MATCHES task)
+    add_executable(${TARGET} exercises/${TARGET}/main.cpp)
+  else()
+    add_executable(${TARGET} homework/${TARGET}/main.cpp)
+  endif()
 
   target_include_directories(${TARGET} PRIVATE include/common)
+
   if(ENABLE_TSAN)
     target_compile_options(${TARGET} PRIVATE -fsanitize=thread)
     target_link_options(${TARGET} PRIVATE -fsanitize=thread)
