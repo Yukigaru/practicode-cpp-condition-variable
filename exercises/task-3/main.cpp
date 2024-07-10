@@ -30,7 +30,7 @@ private:
 /*
  * Тесты
  */
-void test_latch_synchronizes_threads() {
+TEST(test_latch_synchronizes_threads) {
     constexpr auto num_threads = 16;
 
     Latch latch{num_threads};
@@ -47,7 +47,7 @@ void test_latch_synchronizes_threads() {
     }
 }
 
-void test_latch_awaits() {
+TEST(test_latch_awaits) {
     Latch latch{3};
 
     auto worker = [&]() {
@@ -70,7 +70,7 @@ void test_latch_awaits() {
     t2.join();
 }
 
-void test_latch_doesnt_reset() {
+TEST(test_latch_doesnt_reset) {
     Latch latch{2};
 
     auto func = [&]() { latch.arrive_and_wait(); };
@@ -85,16 +85,7 @@ void test_latch_doesnt_reset() {
 }
 
 int main() {
-    try {
-        test_latch_synchronizes_threads();
-        test_latch_awaits();
-        test_latch_doesnt_reset();
-
-    } catch (const std::exception& e) {
-        std::cerr << e.what() << std::endl;
-        return 1;
-    }
-
+    RUN_TESTS();
     return 0;
 }
 /*

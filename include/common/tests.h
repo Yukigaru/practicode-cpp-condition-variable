@@ -8,7 +8,7 @@
 #include <mutex>
 #include <condition_variable>
 
-using TestFunc = void (*)();
+using TestFunc = bool (*)();
 
 std::vector<TestFunc> _all_tests;
 
@@ -46,20 +46,21 @@ std::string to_string(const std::chrono::duration<Rep, Period>& duration) {
 #define EXPECT_FALSE(expr) EXPECT_OP(expr, ==, false)
 
 
+// Макрос запускает тест N раз, а так же вызывает exit, если тест не завершился за 2 секунды
 #define REPEATED_TEST(testFunc, N) \
     void testFunc(); \
-    void testFunc##_wrapper() { \
-        std::atomic_bool finish{false}; \
+    bool testFunc##_wrapper() { \
+        bool finish{false}; \
         std::mutex m; \
         std::condition_variable cv; \
         auto start = std::chrono::steady_clock::now(); \
         std::thread watchdog([&]() { \
             std::unique_lock l{m}; \
             cv.wait(l, [&]() { \
-                return finish.load() || \
+                return finish || \
                        std::chrono::steady_clock::now() - start > std::chrono::seconds(2); \
             }); \
-            if (!finish.load()) { \
+            if (!finish) { \
                 std::cerr << "[FAIL] Test " #testFunc " can't proceed" << std::endl; \
                 std::exit(1); \
             } \
@@ -75,13 +76,14 @@ std::string to_string(const std::chrono::duration<Rep, Period>& duration) {
         } \
         { \
             std::unique_lock l{m}; \
-            finish.store(true); \
+            finish = true; \
             cv.notify_one(); \
         } \
         watchdog.join(); \
         if (pass) { \
             std::cout << "[PASS] " #testFunc << std::endl; \
         } \
+        return pass; \
     } \
     struct testFunc##_registrar { \
         testFunc##_registrar() { _all_tests.push_back(testFunc##_wrapper); } \
@@ -93,6 +95,15 @@ std::string to_string(const std::chrono::duration<Rep, Period>& duration) {
 
 
 #define RUN_TESTS() \
-    for (TestFunc test : _all_tests) { \
-        (*test)(); \
+    try { \
+        for (TestFunc test : _all_tests) { \
+            auto pass = (*test)(); \
+            if (!pass) { \
+                return 1; \
+            } \
+        } \
+    \
+    } catch (const std::exception& e) { \
+        std::cerr << e.what() << std::endl; \
+        return 1; \
     }

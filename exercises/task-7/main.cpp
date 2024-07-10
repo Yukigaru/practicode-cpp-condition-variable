@@ -1,5 +1,6 @@
 #include <iostream>
 #include <thread>
+#include <atomic>
 #include <mutex>
 #include <vector>
 #include <condition_variable>
@@ -41,7 +42,7 @@ private:
 /*
  * Тесты
  */
-void test_simple() {
+TEST(test_simple) {
     RWLock l;
     l.lock();
     l.unlock();
@@ -49,7 +50,7 @@ void test_simple() {
     l.unlock_shared();
 }
 
-void test_readers_dont_block() {
+TEST(test_readers_dont_block) {
     RWLock l;
     l.lock_shared();
     std::thread t{[&]() {
@@ -62,7 +63,7 @@ void test_readers_dont_block() {
     // Если дошли, значит читатели не блокируют друг друга
 }
 
-void test_writer_blocks_reader() {
+TEST(test_writer_blocks_reader) {
     RWLock l;
     l.lock();
 
@@ -80,7 +81,7 @@ void test_writer_blocks_reader() {
     reader.join();
 }
 
-void test_reader_blocks_writer() {
+TEST(test_reader_blocks_writer) {
     RWLock l;
     l.lock_shared();
 
@@ -98,7 +99,7 @@ void test_reader_blocks_writer() {
     reader.join();
 }
 
-void test_two_writers_block_each_other() {
+TEST(test_two_writers_block_each_other) {
     RWLock l;
     l.lock();
 
@@ -116,7 +117,7 @@ void test_two_writers_block_each_other() {
     writer2.join();
 }
 
-void test_many_threads() {
+TEST(test_many_threads) {
     constexpr auto NumThreads = 8;
     RWLock l;
 
@@ -148,18 +149,7 @@ void test_many_threads() {
 }
 
 int main() {
-    try {
-        test_simple();
-        test_readers_dont_block();
-        test_writer_blocks_reader();
-        test_reader_blocks_writer();
-        test_two_writers_block_each_other();
-        test_many_threads();
-
-    } catch (const std::exception& e) {
-        std::cerr << e.what() << std::endl;
-        return 1;
-    }
+    RUN_TESTS();
     return 0;
 }
 /* Усложнение:

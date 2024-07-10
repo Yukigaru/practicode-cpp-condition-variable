@@ -35,7 +35,7 @@ private:
 /*
  * Тесты
  */
-void test_multiple_push_pop() {
+TEST(test_multiple_push_pop) {
     ConcurrentFIFOQueue<int> queue;
 
     queue.push(1);
@@ -46,7 +46,7 @@ void test_multiple_push_pop() {
     EXPECT_EQ(queue.pop(), 3);
 }
 
-void test_pop_wait() {
+TEST(test_pop_wait) {
     ConcurrentFIFOQueue<int> queue;
     std::atomic<bool> item_popped{false};
 
@@ -67,7 +67,7 @@ void test_pop_wait() {
     EXPECT_TRUE(item_popped.load());
 }
 
-void test_multiple_threads() {
+TEST(test_multiple_threads) {
     constexpr auto NumThreads = 4;
     constexpr auto N = 100;  // каждый producer поток производит N чисел (все уникальные)
 
@@ -115,15 +115,7 @@ void test_multiple_threads() {
 }
 
 int main() {
-    try {
-        test_multiple_push_pop();
-        test_pop_wait();
-        test_multiple_threads();
-
-    } catch (const std::exception& e) {
-        std::cerr << e.what() << std::endl;
-        return 1;
-    }
+    RUN_TESTS();
     return 0;
 }
 
