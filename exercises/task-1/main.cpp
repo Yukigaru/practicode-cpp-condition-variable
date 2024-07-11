@@ -26,10 +26,14 @@ int main() {
     std::thread t{waiting_thread_func};
 
     std::cout << "main: waiting 3 sec..." << std::endl;
-    std::this_thread::sleep_for(std::chrono::seconds(3));
+    std::this_thread::sleep_for(std::chrono::seconds(4));
 
     std::cout << "main: signaling the other thread to resume" << std::endl;
-    resume.store(true);
+
+    {
+        // ↓↓↓
+        resume.store(true);
+    }
 
     t.join();
     return 0;
