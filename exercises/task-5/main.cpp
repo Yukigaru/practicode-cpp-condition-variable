@@ -56,7 +56,7 @@ TEST(test_pop_wait) {
         item_popped.store(true);
     }};
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
     EXPECT_FALSE(item_popped.load());
 
     queue.push(1);

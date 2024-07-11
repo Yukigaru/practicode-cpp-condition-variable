@@ -35,6 +35,7 @@ public:
 
 private:
     std::mutex _m;
+    std::condition_variable _cv;
     int _readers_count{0};
     int _writers_count{0};
 };
@@ -72,10 +73,10 @@ TEST(test_writer_blocks_reader) {
         l.lock_shared();
         l.unlock_shared();
         auto end = std::chrono::steady_clock::now();
-        EXPECT_GT(end - start, 99ms);
+        EXPECT_GT(end - start, 49ms);
     });
 
-    std::this_thread::sleep_for(100ms);
+    std::this_thread::sleep_for(50ms);
     l.unlock();
 
     reader.join();
@@ -90,10 +91,10 @@ TEST(test_reader_blocks_writer) {
         l.lock();
         l.unlock();
         auto end = std::chrono::steady_clock::now();
-        EXPECT_GT(end - start, 99ms);
+        EXPECT_GT(end - start, 49ms);
     });
 
-    std::this_thread::sleep_for(100ms);
+    std::this_thread::sleep_for(50ms);
     l.unlock_shared();
 
     reader.join();
@@ -108,10 +109,10 @@ TEST(test_two_writers_block_each_other) {
         l.lock();
         l.unlock();
         auto end = std::chrono::steady_clock::now();
-        EXPECT_GT(end - start, 99ms);
+        EXPECT_GT(end - start, 49ms);
     });
 
-    std::this_thread::sleep_for(100ms);
+    std::this_thread::sleep_for(50ms);
     l.unlock();
 
     writer2.join();
@@ -126,7 +127,7 @@ TEST(test_many_threads) {
     for (int i = 0; i < NumThreads; ++i) {
         threads.emplace_back(
             [&](int idx) {
-                while (std::chrono::steady_clock::now() - start < 100ms) {
+                while (std::chrono::steady_clock::now() - start < 50ms) {
                     // Половина потоков - читатели, половина - писатели
                     if (idx % 2 == 0) {
                         l.lock_shared();

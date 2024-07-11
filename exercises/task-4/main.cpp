@@ -18,11 +18,13 @@ template <typename T>
 class ConcurrentFIFOQueue {
 public:
     void push(const T& val) {
-        // TODO
+        std::unique_lock l{_m};
+        // ...
     }
 
     T pop() {
-        // TODO
+        std::unique_lock l{_m};
+        // ...
         return T{};
     }
 

@@ -56,14 +56,14 @@ TEST(test_latch_awaits) {
 
         // Проверяем, что потоки были в ожидании не менее 100 ms
         auto end = std::chrono::steady_clock::now();
-        EXPECT_GT(end - start, 99ms);
+        EXPECT_GT(end - start, 49ms);
     };
 
     std::thread t1{worker};
     std::thread t2{worker};
 
     // Третий поток задерживает остальных на 100 ms
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
     latch.arrive_and_wait();
 
     t1.join();
