@@ -15,6 +15,7 @@ set(TARGETS
       task-5
       task-6
       hw_call_once
+      hw_future_promise
 )
 
 foreach(TARGET ${TARGETS})

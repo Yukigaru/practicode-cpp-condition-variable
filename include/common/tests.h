@@ -13,10 +13,20 @@ using TestFunc = bool (*)();
 std::vector<TestFunc> _all_tests;
 
 namespace std {
+
+std::string to_string(const char* sliteral) {
+    return std::string{sliteral};
+}
+
+std::string to_string(const std::string& str) {
+    return str;
+}
+
 template <typename Rep, typename Period>
 std::string to_string(const std::chrono::duration<Rep, Period>& duration) {
     return std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(duration).count()) + "ms";
 }
+
 }
 
 #define EXPECT_OP(expr, op, expected) \
@@ -48,6 +58,22 @@ std::string to_string(const std::chrono::duration<Rep, Period>& duration) {
 #define EXPECT_TRUE(expr) EXPECT_OP(expr, ==, true)
 
 #define EXPECT_FALSE(expr) EXPECT_OP(expr, ==, false)
+
+#define EXPECT_THROW(expr, exception_type) \
+    try { \
+        expr; \
+        std::string msg = "Expected exception `" #exception_type "` not thrown by `" #expr "` at line " + std::to_string(__LINE__); \
+        std::string out_msg = "[FAIL] " + ctx.func_name + ": " + msg + "\n"; \
+        std::cerr << out_msg; \
+        throw std::runtime_error(msg); \
+    } catch (const exception_type&) { \
+        /* Expected exception, do nothing */ \
+    } catch (...) { \
+        std::string msg = "Unexpected exception type thrown by `" #expr "` at line " + std::to_string(__LINE__); \
+        std::string out_msg = "[FAIL] " + ctx.func_name + ": " + msg + "\n"; \
+        std::cerr << out_msg; \
+        throw std::runtime_error(msg); \
+    }
 
 
 struct TestContext {
